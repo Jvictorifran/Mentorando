@@ -1,2 +1,2 @@
 # Mentorando
-desenvolvimento usando Python e um freme work django, para aplicação web
+desenvolvimento usando Python e django, para aplicação web

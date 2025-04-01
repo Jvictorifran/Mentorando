@@ -7,18 +7,18 @@ class Navigators(models.Model):
 
   def __str__(self):
     return self.nome
-# Create your models here.
+
 class Mentorados(models.Model):
   estagio_choices = (
     ('E1', '10-100k'),
     ('E2', '100, 1kk')
   )
 
-  Nome = models.CharField(max_length=255)
+  nome = models.CharField(max_length=255)
   foto = models.ImageField(upload_to='fotos', null=True, blank=True)
   estagio = models.CharField(max_length=2, choices=estagio_choices)
-  Navigators = models.ForeignKey(Navigators, null=True, blank=True, on_delete=models.CASCADE)#navigator
-  User = models.ForeignKey(User, on_delete=models.CASCADE) #mentor
+  navigator = models.ForeignKey(Navigators, null=True, blank=True, on_delete=models.CASCADE) #navigator
+  user = models.ForeignKey(User, on_delete=models.CASCADE) #mentor
   criado_em = models.DateField(auto_now_add=True)
   
   def __str__(self):
