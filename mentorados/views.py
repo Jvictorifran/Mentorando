@@ -3,6 +3,7 @@ from django.http import HttpResponse
 from .models import Mentorados, Navigators
 from django.contrib.messages import constants
 from django.contrib import messages
+from datetime import datetime
 
 def mentorados(request):
 
@@ -12,7 +13,18 @@ def mentorados(request):
   if request.method == 'GET':
     navigators = Navigators.objects.filter(user=request.user)
     mentorados = Mentorados.objects.filter(user=request.user)
-    return render (request, 'mentorados.html', {'estagios': Mentorados.estagio_choices, 'navigators': navigators,'mentorados': mentorados})
+
+    estagios_flat = []
+    for i in Mentorados.estagio_choices:
+      estagios_flat.append(i[1])
+      
+    qtd_estagios = []
+
+    for i, j in Mentorados.estagio_choices:
+      x = Mentorados.objects.filter(estagio=i).filter(user=request.user).count()
+      qtd_estagios.append(x) 
+
+    return render (request, 'mentorados.html', {'estagios': Mentorados.estagio_choices, 'navigators': navigators,'mentorados': mentorados, 'estagios_flat': estagios_flat, 'qtd_estagios': qtd_estagios})
   
   elif request.method == 'POST':
         
@@ -33,3 +45,14 @@ def mentorados(request):
 
         messages.add_message(request, constants.SUCCESS, 'Mentorado cadastrado com sucesso.')
         return redirect('mentorados')
+
+def reunioes(request):
+  if request.method == 'GET':
+    return render(request, 'reunioes.html')
+
+  elif request.method == 'POST':
+    data = request.POST.get('data')
+    data = datetime.strptime(data, "%Y-%m-%dT:%M")
+    print(data)
+    print(type(data))
+    return HttpResponse(data)
