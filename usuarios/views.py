@@ -7,52 +7,45 @@ from django.contrib.auth import authenticate
 from django.contrib import auth
 
 def cadastro(request):
-  if request.method == 'GET':
+    if request.method == 'GET':
+        return render(request, 'cadastro.html')
+    elif request.method == 'POST':
+        username = request.POST.get('username')
+        senha = request.POST.get('senha')
+        confirmar_senha = request.POST.get('confirmar_senha')
 
-    return render(request, 'cadastro.html')
-  
-  elif request.method == 'POST':
+        if senha != confirmar_senha:
+            messages.add_message(request, constants.ERROR, 'Senha e confirmar senha devem ser iguais')
+            return redirect('/usuarios/cadastro/')
 
-    username = request.POST.get('username')
-    senha = request.POST.get('senha')
-    confirmar_senha = request.POST.get('confirmar_senha')
+        if len(senha) < 6:
+            messages.add_message(request, constants.ERROR, 'A senha deve ter 6 ou mais caracteres')
+            return redirect('/usuarios/cadastro/')
 
-    if senha != confirmar_senha:
-      messages.add_message(request, constants.ERROR, 'As Senhas não são iguais')
-      return redirect("/usuarios/cadastro")
-    
-    if len(senha) < 6:
-      messages.add_message(request, constants.ERROR, 'Quantidade de caractere Invalida, a senha deve ter mais de 6 caracteres')
-      return redirect("/usuarios/cadastro")
-    
-    users = User.objects.filter(username = username)
-    print(users.exists())
+        users = User.objects.filter(username=username)
+        if users.exists():
+            messages.add_message(request, constants.ERROR, 'Já existe um usuário com esse username')
+            return redirect('/usuarios/cadastro/')
 
-    if users.exists():
-      messages.add_message(request, constants.ERROR, 'Seu usuario já existe')
-      return redirect("/usuarios/cadastro")
-          
-    User.objects.create_user(
-      username = username,
-      password = senha
-    )
+        User.objects.create_user(
+            username = username,
+            password = senha
+        )
 
-    return redirect('/usuarios/login')
+        return redirect('/usuarios/login')
 
 def login(request):
-  if request.method == 'GET':
-    return render(request, 'login.html')
-  
-  elif request.method == 'POST':
-    username = request.POST.get('username')
-    senha = request.POST.get('senha')
+    if request.method == 'GET':
+        return render(request, 'login.html')
+    else:
+        username = request.POST.get('username')
+        senha = request.POST.get('senha')
 
-    user = authenticate(request, username = username, password = senha)
+        user = authenticate(request, username=username, password=senha)
 
-    if user:
-      auth.login(request, user)
-      return redirect('/mentorados/')
-    
-    messages.add_message(request, constants.ERROR, "Usarname ou senha incorretos")
-    return redirect('login')
-
+        if user:
+            auth.login(request, user)
+            return redirect('/mentorados/')
+        
+        messages.add_message(request, constants.ERROR, 'Username ou senha inválidos')
+        return redirect('login')
